@@ -24,7 +24,7 @@ Este projeto foi desenvolvido como parte do Projeto Multidisciplinar do curso de
 │   ├── routes/         # Endpoints da API
 │   ├── services/       # Regras de negócio
 │   └── main.py         # Arquivo de inicialização
-├── requirements.txt    # Dependências do projeto
+├── requirements    # Dependências do projeto
 └── README.md
 ```
 ### Como Executar o Projeto
@@ -34,7 +34,7 @@ git clone https://github.com/desyreegarcia/Projeto-BackEnd-SGHSS
 ```
 Instale as dependências:
 ```Bash
-pip install -r requirements.txt
+pip install -r requirements
 ```
 Inicie o servidor:
 
