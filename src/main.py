@@ -2,12 +2,13 @@
 from fastapi import FastAPI, Depends, HTTPException # Ferramentas do FastAPI
 from sqlalchemy.orm import Session # Tipo de dado para a sessão do banco
 from .models import models, schemas, database # Arquivos internos
+from typing import List
 
 # Comando que lê os modelos e cria as tabelas no arquivo sghss.db se elas não existirem
 models.Base.metadata.create_all(bind=database.engine)
 
 # Inicializa a aplicação FastAPI com título e versão para o Swagger
-app = FastAPI(title="SGHSS", version="1.0.0")
+app = FastAPI(title="SGHSS")
 
 # Função de conexão com o banco
 def get_db():
@@ -17,6 +18,51 @@ def get_db():
     finally:
         db.close() # Fecha a conexão obrigatoriamente ao terminar
 
+# ----- ROTAS PARA PERFIL -----
+
+# Criar perfil de acesso
+@app.post("/perfis/", response_model=schemas.Perfil)
+def criar_perfil(perfil: schemas.PerfilCreate, db: Session = Depends(get_db)):
+    db_perfil = models.Perfil(nome_perfil=perfil.nome_perfil)
+    db.add(db_perfil)
+    db.commit()
+    db.refresh(db_perfil)
+    return db_perfil
+
+# Listar perfis
+@app.get("/perfis/", response_model=List[schemas.Perfil])
+def listar_perfis(db: Session = Depends(get_db)): 
+    return db.query(models.Perfil).all()
+
+# ----- ROTAS PARA USUÁRIOS -----
+
+# Criar usuário e vincular a um perfil. 
+@app.post("/usuarios/", response_model=schemas.User)
+def criar_usuario(usuario: schemas.UserCreate, db: Session = Depends(get_db)):
+    # Verifica se o CPF já existe para evitar duplicidade (Requisito de integridade)
+    usuario_existente = db.query(models.User).filter(models.User.cpf == usuario.cpf).first()
+    if usuario_existente:
+        raise HTTPException(status_code=400, detail="CPF já cadastrado.")
+
+    # Criar objeto no banco de dados
+    db_user = models.User(
+        nome_user=usuario.nome_user,
+        cpf=usuario.cpf,
+        senha_hash=usuario.senha, # Simulando o armazenamento do hash
+        id_perfil=usuario.id_perfil
+    )
+    
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+# Lista usuários
+@app.get("/usuarios/", response_model=List[schemas.User])
+def listar_usuarios(db: Session = Depends(get_db)):
+    return db.query(models.User).all()
+
+'''
 # Home
 @app.get("/", tags=["Home"])
 def home():
@@ -66,4 +112,4 @@ def criar_medico(medico: schemas.MedicoCreate, db: Session = Depends(get_db)):
 # GET para listar todos os médicos
 @app.get("/medicos/", response_model=list[schemas.Medico], tags=["Médicos"])
 def listar_medicos(db: Session = Depends(get_db)):
-    return db.query(models.Medico).all() # Busca e retorna todos os médicos
+    return db.query(models.Medico).all() # Busca e retorna todos os médicos'''
