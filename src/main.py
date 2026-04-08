@@ -21,7 +21,7 @@ def get_db():
 # ----- ROTAS PARA PERFIL -----
 
 # Criar perfil de acesso
-@app.post("/perfis/", response_model=schemas.Perfil)
+@app.post("/perfis/", response_model=schemas.Perfil, tags=["Perfil de Acesso"])
 def criar_perfil(perfil: schemas.PerfilCreate, db: Session = Depends(get_db)):
     db_perfil = models.Perfil(nome_perfil=perfil.nome_perfil)
     db.add(db_perfil)
@@ -30,14 +30,14 @@ def criar_perfil(perfil: schemas.PerfilCreate, db: Session = Depends(get_db)):
     return db_perfil
 
 # Listar perfis
-@app.get("/perfis/", response_model=List[schemas.Perfil])
+@app.get("/perfis/", response_model=List[schemas.Perfil], tags=["Perfil de Acesso"])
 def listar_perfis(db: Session = Depends(get_db)): 
     return db.query(models.Perfil).all()
 
 # ----- ROTAS PARA USUÁRIOS -----
 
 # Criar usuário e vincular a um perfil. 
-@app.post("/usuarios/", response_model=schemas.User)
+@app.post("/usuarios/", response_model=schemas.User, tags=["Usuários"])
 def criar_usuario(usuario: schemas.UserCreate, db: Session = Depends(get_db)):
     # Verifica se o CPF já existe para evitar duplicidade (Requisito de integridade)
     usuario_existente = db.query(models.User).filter(models.User.cpf == usuario.cpf).first()
@@ -58,19 +58,13 @@ def criar_usuario(usuario: schemas.UserCreate, db: Session = Depends(get_db)):
     return db_user
 
 # Lista usuários
-@app.get("/usuarios/", response_model=List[schemas.User])
+@app.get("/usuarios/", response_model=List[schemas.User], tags=["Usuários"])
 def listar_usuarios(db: Session = Depends(get_db)):
     return db.query(models.User).all()
 
-'''
-# Home
-@app.get("/", tags=["Home"])
-def home():
-    return {"mensagem": "API SGHSS Online"} # Retorna um JSON simples de status
+# ----- ROTA PARA PACIENTES -----
 
-# --- PACIENTES ---
-
-# POST para cadastrar um novo paciente
+# Cadastrar um novo paciente
 @app.post("/pacientes/", response_model=schemas.Paciente, tags=["Pacientes"])
 def criar_paciente(paciente: schemas.PacienteCreate, db: Session = Depends(get_db)):
     # Busca no banco se já existe alguém com o mesmo CPF
@@ -86,14 +80,14 @@ def criar_paciente(paciente: schemas.PacienteCreate, db: Session = Depends(get_d
     db.refresh(novo_paciente) # Atualiza o objeto com o ID gerado pelo banco
     return novo_paciente # Retorna o paciente cadastrado para confirmação
 
-# GET para listar pacientes cadastrados
+# Listar pacientes cadastrados
 @app.get("/pacientes/", response_model=list[schemas.Paciente], tags=["Pacientes"])
 def listar_pacientes(db: Session = Depends(get_db)):
     return db.query(models.Paciente).all() # Busca todos os registros e retorna
 
-# --- MÉDICOS ---
+# ----- MÉDICOS -----
 
-# POST para cadastrar um novo médico
+# Cadastrar um novo médico
 @app.post("/medicos/", response_model=schemas.Medico, tags=["Médicos"])
 def criar_medico(medico: schemas.MedicoCreate, db: Session = Depends(get_db)):
     # Verifica se o Registro Profissional já existe (Segurança de Dados)
@@ -109,7 +103,7 @@ def criar_medico(medico: schemas.MedicoCreate, db: Session = Depends(get_db)):
     db.refresh(novo_medico) # Atualiza com o ID gerado
     return novo_medico # Retorna os dados do médico cadastrado
 
-# GET para listar todos os médicos
+# Listar todos os médicos
 @app.get("/medicos/", response_model=list[schemas.Medico], tags=["Médicos"])
 def listar_medicos(db: Session = Depends(get_db)):
     return db.query(models.Medico).all() # Busca e retorna todos os médicos'''
