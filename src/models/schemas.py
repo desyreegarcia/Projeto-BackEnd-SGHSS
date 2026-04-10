@@ -23,21 +23,22 @@ class UserBase(BaseModel):
     id_perfil: int
 
 class UserCreate(UserBase):
-    senha: str # Senha em texto puro que o usuário envia (será criptografada no banco)
+    senha_hash: str # Senha em texto puro que o usuário envia (será criptografada no banco)
 
 class User(UserBase):
     id_user: int
-    # Não foi incluída a senha_hash aqui por segurança (LGPD)
     model_config = ConfigDict(from_attributes=True)
+    # Não foi incluída a senha_hash aqui por segurança (LGPD)
 
 # ----- PACIENTE -----
 
 class PacienteBase(BaseModel):
+    id_user: int
     data_nascimento: str
     tipo_sanguineo: str
 
 class PacienteCreate(PacienteBase):
-    id_user: int
+    pass
 
 class Paciente(PacienteBase):
     id_paciente: int
