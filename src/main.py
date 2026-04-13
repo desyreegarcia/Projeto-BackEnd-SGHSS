@@ -112,22 +112,18 @@ def agendar_consulta(consulta: schemas.ConsultaCreate, db: Session = Depends(get
     if not db_medico:
         raise HTTPException(status_code=404, detail="Médico não encontrado no sistema.")
 
-    # Cria a Consulta com os dados validados
-    db_consulta = models.Consulta(
-        id_paciente=consulta.id_paciente,   # Vínculo com o paciente
-        id_medico=consulta.id_medico,   # Vínculo com o médico
-        tipo_consulta=consulta.tipo_consulta,   # Salva se é 'Presencial' ou 'Telemedicina'
-        status= "Agendada"
-    )
+    # Cria a Consulta
+    db_consulta = models.Consulta(**consulta.model_dump())
+    db_consulta.status = "Agendada"
     
     # Adiciona ao db
-    db.add(db_consulta) # Adiciona a nova consulta ao db
-    db.commit() # Confirma a transação no banco de dados (commit)
-    db.refresh(db_consulta) # Atualiza o objeto com os dados gerados pelo banco (como o id_consulta)
-    return db_consulta # Retorna a consulta criada conforme o formato do schema definido
+    db.add(db_consulta)
+    db.commit()
+    db.refresh(db_consulta)
+    return db_consulta
 
 # Cancelar uma consulta - Utiliza o método PUT pois trata-se de um dado existente
-@app.put("/consultas/{id_consulta}/cancelar", response_model=schemas.Consulta)
+@app.put("/consultas/{id_consulta}/cancelar", response_model=schemas.Consulta, tags=["Consultas"])
 def cancelar_consulta(id_consulta: int, db: Session = Depends(get_db)):
     # Busca a consulta no banco de dados / Se não for encontrada, retorna erro 404 
     db_consulta = db.query(models.Consulta).filter(models.Consulta.id_consulta == id_consulta).first()
@@ -141,13 +137,13 @@ def cancelar_consulta(id_consulta: int, db: Session = Depends(get_db)):
     return db_consulta
 
 # Listar as consultas de um paciente específico
-@app.get("/consultas/paciente/{id_paciente}", response_model=List[schemas.Consulta])
+@app.get("/consultas/paciente/{id_paciente}", response_model=List[schemas.Consulta], tags=["Consultas"])
 def listar_historico_paciente(id_paciente: int, db: Session = Depends(get_db)):
     consultas = db.query(models.Consulta).filter(models.Consulta.id_paciente == id_paciente).all()
     return consultas
 
 # Médico visualizar sua agenda/lista de atendimentos
-@app.get("/consultas/medico/{id_medico}", response_model=List[schemas.Consulta])
+@app.get("/consultas/medico/{id_medico}", response_model=List[schemas.Consulta], tags=["Consultas"])
 def listar_agenda_medico(id_medico: int, db: Session = Depends(get_db)):
     agenda = db.query(models.Consulta).filter(models.Consulta.id_medico == id_medico).all()
     return agenda

@@ -76,6 +76,8 @@ class Prontuario(ProntuarioBase):
 class ConsultaBase(BaseModel):
     id_paciente: int
     id_medico: int
+    data_consulta: str
+    hora_consulta: str
     tipo_consulta: str # "Presencial" ou "Telemedicina"
     status: str # "Agendada", "Realizada", etc.
 
@@ -84,9 +86,9 @@ class ConsultaCreate(ConsultaBase):
 
 class Consulta(ConsultaBase):
     id_consulta: int
-    data_hora: datetime
-    # Opcional: O prontuário só aparece se existir e o usuário tiver permissão
-    prontuario: Optional[Prontuario] = None 
+    data_consulta: str
+    hora_consulta: str
+    prontuario: Optional[Prontuario] = None # Opcional pois o prontuário só aparece se existir e o usuário tiver permissão
     model_config = ConfigDict(from_attributes=True)
 
 # ----- LOGS (AUDITORIA) -----
