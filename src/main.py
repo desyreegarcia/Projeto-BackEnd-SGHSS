@@ -1,4 +1,4 @@
-#Imports
+'''#Imports
 from fastapi import FastAPI, Depends, HTTPException # Ferramentas do FastAPI
 from sqlalchemy.orm import Session # Tipo de dado para a sessão do banco
 from .models import models, schemas, database # Arquivos internos
@@ -146,4 +146,19 @@ def listar_historico_paciente(id_paciente: int, db: Session = Depends(get_db)):
 @app.get("/consultas/medico/{id_medico}", response_model=List[schemas.Consulta], tags=["Consultas"])
 def listar_agenda_medico(id_medico: int, db: Session = Depends(get_db)):
     agenda = db.query(models.Consulta).filter(models.Consulta.id_medico == id_medico).all()
-    return agenda
+    return agenda'''
+
+from fastapi import FastAPI, Depends, HTTPException # Ferramentas do FastAPI
+from sqlalchemy.orm import Session # Tipo de dado para a sessão do banco
+from .models import models, schemas, database # Arquivos internos
+from typing import List
+from src.router import perfil, user, paciente, medicos, atendimentos
+
+app = FastAPI()
+
+# Registro das rotas
+app.include_router(perfil.router)
+app.include_router(user.router)
+app.include_router(paciente.router)
+app.include_router(medicos.router)
+app.include_router(atendimentos.router)
