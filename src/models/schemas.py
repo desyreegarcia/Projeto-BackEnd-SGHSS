@@ -30,6 +30,12 @@ class User(UserBase):
     model_config = ConfigDict(from_attributes=True)
     # Não foi incluída a senha_hash aqui por segurança (LGPD)
 
+class UserUpdate(BaseModel):
+    nome_user: str
+    user_ativo: bool
+    model_config = ConfigDict(from_attributes=True)
+
+
 # ----- PACIENTE -----
 
 class PacienteBase(BaseModel):

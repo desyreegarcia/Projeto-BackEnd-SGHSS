@@ -1,5 +1,5 @@
 #Importações e bibliotecas
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text # Tipos de colunas
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey, Text # Tipos de colunas
 from sqlalchemy.orm import relationship # Função para criar vínculos entre tabelas
 from .database import Base # Base que foi criada no arquivo database.py
 import datetime # Para manipular datas e horas
@@ -18,6 +18,7 @@ class User(Base):
     nome_user = Column(String)
     cpf = Column(String, unique=True) # CPF - não pode repetir
     senha_hash = Column(String) # Senha criptografada
+    user_ativo = Column(Boolean, default=True)
 
     perfil = relationship("Perfil") # Um usuário tem um perfil
 
