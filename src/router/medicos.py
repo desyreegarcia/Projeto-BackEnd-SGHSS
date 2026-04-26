@@ -21,7 +21,7 @@ def get_db():
 # ----- MÉDICOS -----
 
 # Cadastrar um novo médico
-@router.post("/medicos/", response_model=schemas.Medico, tags=["Médicos"])
+@router.post("/medicos/", response_model=schemas.Medico)
 def criar_medico(medico: schemas.MedicoCreate, db: Session = Depends(get_db)):
     # Verifica se o Registro Profissional já existe / Se existir, retorna erro 400
     db_medico = db.query(models.Medico).filter(models.Medico.registro_profissional == medico.registro_profissional).first()
@@ -36,6 +36,20 @@ def criar_medico(medico: schemas.MedicoCreate, db: Session = Depends(get_db)):
     return novo_medico
 
 # Listar todos os médicos
-@router.get("/medicos/", response_model=list[schemas.Medico], tags=["Médicos"])
+@router.get("/medicos/", response_model=list[schemas.Medico])
 def listar_medicos(db: Session = Depends(get_db)):
     return db.query(models.Medico).all()
+
+# Atualizar nome do medico
+@router.put("/{id_user}", response_model=schemas.Medico)
+def atualizar_medico(id_user: str, medico_atualizado: schemas.MedicoUpdate, db: Session = Depends(get_db)):
+    db_medico = db.query(models.Medico).filter(models.Medico.id_user == id_user).first()
+    
+    '''if not db_paciente:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Usuário não localizado")'''
+
+    db_medico.especialidade = medico_atualizado.especialidade
+    db.commit()
+    db.refresh(db_medico)
+    return db_medico

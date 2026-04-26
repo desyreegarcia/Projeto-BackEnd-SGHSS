@@ -57,6 +57,7 @@ class PacienteUpdate(BaseModel):
 # ----- MÉDICO -----
 
 class MedicoBase(BaseModel):
+    id_user: int
     registro_profissional: str
     especialidade: str
 
@@ -66,6 +67,10 @@ class MedicoCreate(MedicoBase):
 class Medico(MedicoBase):
     id_medico: int
     user: User # Traz os dados básicos do usuário vinculado
+    model_config = ConfigDict(from_attributes=True)
+
+class MedicoUpdate(BaseModel):
+    especialidade: str
     model_config = ConfigDict(from_attributes=True)
 
 # ----- CONSULTA E PRONTUÁRIO -----
