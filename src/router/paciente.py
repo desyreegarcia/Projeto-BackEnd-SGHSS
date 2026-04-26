@@ -21,7 +21,7 @@ def get_db():
 # ----- ROTA PARA PACIENTES -----
 
 # Cadastrar um novo paciente
-@router.post("/pacientes/", response_model=schemas.Paciente, tags=["Pacientes"])
+@router.post("/pacientes/", response_model=schemas.Paciente)
 def criar_paciente(paciente: schemas.PacienteCreate, db: Session = Depends(get_db)):
     
     # Adiciona ao db
@@ -32,7 +32,7 @@ def criar_paciente(paciente: schemas.PacienteCreate, db: Session = Depends(get_d
     return novo_paciente # Retorna
 
 # Listar pacientes cadastrados
-@router.get("/pacientes/", response_model=list[schemas.Paciente], tags=["Pacientes"])
+@router.get("/pacientes/", response_model=list[schemas.Paciente])
 def listar_pacientes(db: Session = Depends(get_db)):
     return db.query(models.Paciente).all() # Busca todos os registros e retorna
 
