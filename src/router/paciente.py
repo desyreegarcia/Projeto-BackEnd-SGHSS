@@ -35,3 +35,17 @@ def criar_paciente(paciente: schemas.PacienteCreate, db: Session = Depends(get_d
 @router.get("/pacientes/", response_model=list[schemas.Paciente], tags=["Pacientes"])
 def listar_pacientes(db: Session = Depends(get_db)):
     return db.query(models.Paciente).all() # Busca todos os registros e retorna
+
+# Atualizar nome do paciente
+@router.put("/{id_user}", response_model=schemas.Paciente)
+def atualizar_paciente(id_user: str, paciente_atualizado: schemas.PacienteUpdate, db: Session = Depends(get_db)):
+    db_paciente = db.query(models.Paciente).filter(models.Paciente.id_user == id_user).first()
+    
+    '''if not db_paciente:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Usuário não localizado")'''
+
+    db_paciente.data_nascimento = paciente_atualizado.data_nascimento
+    db.commit()
+    db.refresh(db_paciente)
+    return db_paciente

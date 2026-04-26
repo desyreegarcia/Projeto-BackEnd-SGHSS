@@ -32,7 +32,6 @@ class User(UserBase):
 
 class UserUpdate(BaseModel):
     nome_user: str
-    user_ativo: bool
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -49,6 +48,10 @@ class PacienteCreate(PacienteBase):
 class Paciente(PacienteBase):
     id_paciente: int
     user: User # Traz os dados básicos do usuário vinculado
+    model_config = ConfigDict(from_attributes=True)
+
+class PacienteUpdate(BaseModel):
+    data_nascimento: str
     model_config = ConfigDict(from_attributes=True)
 
 # ----- MÉDICO -----

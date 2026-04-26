@@ -36,9 +36,9 @@ def listar_usuarios(db: Session = Depends(get_db)):
     return db.query(models.User).all()
 
 # Atualizar nome do usuário
-@router.put("/{CPF}", response_model=schemas.User)
-def atualizar_user(cpf: str, user_atualizado: schemas.UserUpdate, db: Session = Depends(get_db)):
-    db_user = db.query(models.User).filter(models.User.cpf == cpf).first()
+@router.put("/{id_user}", response_model=schemas.User)
+def atualizar_user(id_user: str, user_atualizado: schemas.UserUpdate, db: Session = Depends(get_db)):
+    db_user = db.query(models.User).filter(models.User.id_user == id_user).first()
     
     '''if not db_user:
         from fastapi import HTTPException
