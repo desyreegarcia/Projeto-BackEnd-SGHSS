@@ -14,3 +14,11 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Classe base que todas as tabelas irão herdar
 Base = declarative_base()
+
+# Função de conexão com o banco
+def get_db():
+    db = SessionLocal() # Abre a conexão
+    try:
+        yield db # Entrega a conexão para a rota solicitada
+    finally:
+        db.close() # Fecha a conexão obrigatoriamente ao terminar

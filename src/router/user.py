@@ -2,18 +2,11 @@
 from fastapi import APIRouter, FastAPI, Depends, HTTPException # Ferramentas do FastAPI
 from sqlalchemy.orm import Session # Tipo de dado para a sessão do banco
 from ..models import models, schemas, database # Arquivos internos
+from ..models.database import get_db
 from typing import List
 
 # Inicializa a aplicação FastAPI com título e versão para o Swagger
 router = APIRouter(prefix="/user", tags=["Usuário"])
-
-# Função de conexão com o banco
-def get_db():
-    db = database.SessionLocal() # Abre a conexão
-    try:
-        yield db # Entrega a conexão para a rota solicitada
-    finally:
-        db.close() # Fecha a conexão obrigatoriamente ao terminar
 
 # Criar usuário e vincular a um perfil. 
 @router.post("/", response_model=schemas.User)
@@ -37,7 +30,7 @@ def listar_usuarios(db: Session = Depends(get_db)):
 
 # Atualizar nome do usuário
 @router.put("/{id_user}", response_model=schemas.User)
-def atualizar_user(id_user: str, user_atualizado: schemas.UserUpdate, db: Session = Depends(get_db)):
+def atualizar_user(id_user: int, user_atualizado: schemas.UserUpdate, db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(models.User.id_user == id_user).first()
     
     '''if not db_user:

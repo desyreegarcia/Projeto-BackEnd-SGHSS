@@ -3,6 +3,9 @@ from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 from typing import Optional, List
 
+class BaseSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
 # ----- PERFIL -----
 
 class PerfilBase(BaseModel):
@@ -11,9 +14,8 @@ class PerfilBase(BaseModel):
 class PerfilCreate(PerfilBase):
     pass # Usado na criação de um novo perfil
 
-class Perfil(PerfilBase):
+class Perfil(PerfilBase, BaseSchema):
     id_perfil: int
-    model_config = ConfigDict(from_attributes=True) # Ler dados do SQLAlchemy
 
 # ----- USUÁRIO -----
 
@@ -25,15 +27,12 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     senha_hash: str # Senha em texto puro que o usuário envia (será criptografada no banco)
 
-class User(UserBase):
+class User(UserBase, BaseSchema):
     id_user: int
-    model_config = ConfigDict(from_attributes=True)
     # Não foi incluída a senha_hash aqui por segurança (LGPD)
 
-class UserUpdate(BaseModel):
+class UserUpdate(BaseSchema):
     nome_user: str
-    model_config = ConfigDict(from_attributes=True)
-
 
 # ----- PACIENTE -----
 
@@ -45,14 +44,12 @@ class PacienteBase(BaseModel):
 class PacienteCreate(PacienteBase):
     pass
 
-class Paciente(PacienteBase):
+class Paciente(PacienteBase, BaseSchema):
     id_paciente: int
     user: User # Traz os dados básicos do usuário vinculado
-    model_config = ConfigDict(from_attributes=True)
 
-class PacienteUpdate(BaseModel):
+class PacienteUpdate(BaseSchema):
     data_nascimento: str
-    model_config = ConfigDict(from_attributes=True)
 
 # ----- MÉDICO -----
 
@@ -64,14 +61,12 @@ class MedicoBase(BaseModel):
 class MedicoCreate(MedicoBase):
     id_user: int
 
-class Medico(MedicoBase):
+class Medico(MedicoBase, BaseSchema):
     id_medico: int
     user: User # Traz os dados básicos do usuário vinculado
-    model_config = ConfigDict(from_attributes=True)
 
-class MedicoUpdate(BaseModel):
+class MedicoUpdate(BaseSchema):
     especialidade: str
-    model_config = ConfigDict(from_attributes=True)
 
 # ----- CONSULTA E PRONTUÁRIO -----
 
@@ -82,10 +77,9 @@ class ProntuarioBase(BaseModel):
 class ProntuarioCreate(ProntuarioBase):
     id_consulta: int
 
-class Prontuario(ProntuarioBase):
+class Prontuario(ProntuarioBase, BaseSchema):
     id_prontuario: int
     data_atualizacao: datetime
-    model_config = ConfigDict(from_attributes=True)
 
 class ConsultaBase(BaseModel):
     id_paciente: int
@@ -98,19 +92,17 @@ class ConsultaBase(BaseModel):
 class ConsultaCreate(ConsultaBase):
     pass
 
-class Consulta(ConsultaBase):
+class Consulta(ConsultaBase, BaseSchema):
     id_consulta: int
     data_consulta: str
     hora_consulta: str
     prontuario: Optional[Prontuario] = None # Opcional pois o prontuário só aparece se existir e o usuário tiver permissão
-    model_config = ConfigDict(from_attributes=True)
 
 # ----- LOGS (AUDITORIA) -----
 
-class LogAuditoria(BaseModel):
+class LogAuditoria(BaseSchema):
     id_log: int
     id_user: int
     acao: str
     data_hora: datetime
     ip_origem: str
-    model_config = ConfigDict(from_attributes=True)

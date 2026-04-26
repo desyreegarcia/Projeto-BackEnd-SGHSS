@@ -2,26 +2,16 @@
 from fastapi import APIRouter, FastAPI, Depends, HTTPException # Ferramentas do FastAPI
 from sqlalchemy.orm import Session # Tipo de dado para a sessão do banco
 from ..models import models, schemas, database # Arquivos internos
+from ..models.database import get_db
 from typing import List
-
-# Comando que lê os modelos e cria as tabelas no arquivo sghss.db se elas não existirem
-models.Base.metadata.create_all(bind=database.engine)
 
 # Inicializa a aplicação FastAPI com título e versão para o Swagger
 router = APIRouter(prefix="/pacientes", tags=["Pacientes"])
 
-# Função de conexão com o banco
-def get_db():
-    db = database.SessionLocal() # Abre a conexão
-    try:
-        yield db # Entrega a conexão para a rota solicitada
-    finally:
-        db.close() # Fecha a conexão obrigatoriamente ao terminar
-
 # ----- ROTA PARA PACIENTES -----
 
 # Cadastrar um novo paciente
-@router.post("/pacientes/", response_model=schemas.Paciente)
+@router.post("/", response_model=schemas.Paciente)
 def criar_paciente(paciente: schemas.PacienteCreate, db: Session = Depends(get_db)):
     
     # Adiciona ao db
@@ -32,18 +22,16 @@ def criar_paciente(paciente: schemas.PacienteCreate, db: Session = Depends(get_d
     return novo_paciente # Retorna
 
 # Listar pacientes cadastrados
-@router.get("/pacientes/", response_model=list[schemas.Paciente])
+@router.get("/", response_model=list[schemas.Paciente])
 def listar_pacientes(db: Session = Depends(get_db)):
     return db.query(models.Paciente).all() # Busca todos os registros e retorna
 
 # Atualizar nome do paciente
 @router.put("/{id_user}", response_model=schemas.Paciente)
-def atualizar_paciente(id_user: str, paciente_atualizado: schemas.PacienteUpdate, db: Session = Depends(get_db)):
+def atualizar_paciente(id_user: int, paciente_atualizado: schemas.PacienteUpdate, db: Session = Depends(get_db)):
     db_paciente = db.query(models.Paciente).filter(models.Paciente.id_user == id_user).first()
-    
-    '''if not db_paciente:
-        from fastapi import HTTPException
-        raise HTTPException(status_code=404, detail="Usuário não localizado")'''
+    if not db_paciente:
+        raise HTTPException(status_code=404, detail="Paciente não localizado")
 
     db_paciente.data_nascimento = paciente_atualizado.data_nascimento
     db.commit()
