@@ -8,18 +8,16 @@ from typing import List
 # Inicializa a aplicação FastAPI com título e versão para o Swagger
 router = APIRouter(prefix="/consultas", tags=["Consultas"])
 
-# --- ROTAS PARA CONSULTAS/ATENDIMENTOS ---
-
 # Criar consulta
 @router.post("/", response_model=schemas.Consulta)
 def agendar_consulta(consulta: schemas.ConsultaCreate, db: Session = Depends(get_db)):
 
-    # Busca o paciente no banco de dados usando o ID / Se não for encontrado, retorna erro 404
+    # Busca o paciente no banco de dados usando o ID / Se não for encontrado, retorna erro
     db_paciente = db.query(models.Paciente).filter(models.Paciente.id_paciente == consulta.id_paciente).first()
     if not db_paciente:
         raise HTTPException(status_code=404, detail="Paciente não encontrado no sistema.")
 
-    # Busca o médico no banco de dados usando o ID / Se não for encontrado, retorna erro 404
+    # Busca o médico no banco de dados usando o ID / Se não for encontrado, retorna erro
     db_medico = db.query(models.Medico).filter(models.Medico.id_medico == consulta.id_medico).first()
     if not db_medico:
         raise HTTPException(status_code=404, detail="Médico não encontrado no sistema.")
@@ -47,6 +45,11 @@ def cancelar_consulta(id_consulta: int, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_consulta)
     return db_consulta
+
+# Listar todas as consultas
+@router.get("/", response_model=list[schemas.Consulta])
+def listar_consultas(db: Session = Depends(get_db)):
+    return db.query(models.Consulta).all()
 
 # Listar as consultas de um paciente específico
 @router.get("/paciente/{id_paciente}", response_model=List[schemas.Consulta])

@@ -8,32 +8,28 @@ from typing import List
 # Inicializa a aplicação FastAPI com título e versão para o Swagger
 router = APIRouter(prefix="/pacientes", tags=["Pacientes"])
 
-# ----- ROTA PARA PACIENTES -----
-
 # Cadastrar um novo paciente
 @router.post("/", response_model=schemas.Paciente)
 def criar_paciente(paciente: schemas.PacienteCreate, db: Session = Depends(get_db)):
-    
-    # Adiciona ao db
     novo_paciente = models.Paciente(**paciente.model_dump())
-    db.add(novo_paciente) # Adiciona
-    db.commit() # Grava
-    db.refresh(novo_paciente) # Atualiza
-    return novo_paciente # Retorna
+    db.add(novo_paciente)
+    db.commit()
+    db.refresh(novo_paciente)
+    return novo_paciente
 
 # Listar pacientes cadastrados
 @router.get("/", response_model=list[schemas.Paciente])
 def listar_pacientes(db: Session = Depends(get_db)):
     return db.query(models.Paciente).all() # Busca todos os registros e retorna
 
-# Atualizar nome do paciente
+# Atualizar nome do paciente buscando pelo id_user.
+# Deixei apenas a atualização do nome, pois os outros campos (CPF e data de nascimento) não devem ser alterados com facilidade.
 @router.put("/{id_user}", response_model=schemas.Paciente)
 def atualizar_paciente(id_user: int, paciente_atualizado: schemas.PacienteUpdate, db: Session = Depends(get_db)):
     db_paciente = db.query(models.Paciente).filter(models.Paciente.id_user == id_user).first()
-    if not db_paciente:
-        raise HTTPException(status_code=404, detail="Paciente não localizado")
-
     db_paciente.data_nascimento = paciente_atualizado.data_nascimento
     db.commit()
     db.refresh(db_paciente)
     return db_paciente
+
+# Deixei sem a função delete pois a intenção é ter pacientes sempre vinculados a um usuário e a consultas, e não excluir estes dados do sistema.

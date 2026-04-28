@@ -8,7 +8,7 @@ import datetime # Para manipular datas e horas
 class Perfil(Base):
     __tablename__ = "perfil" # Nome da tabela no banco de dados
     id_perfil = Column(Integer, primary_key=True, index=True)
-    nome_perfil = Column(String) #(1 = 'Admin', 2 = 'Paciente', 3 = 'Medico', )
+    nome_perfil = Column(String) #(1 = 'Admin', 2 = 'Paciente', 3 = 'Medico')
 
 # --- Tabela de Usuarios ---
 class User(Base):

@@ -22,13 +22,10 @@ def criar_perfil(perfil: schemas.PerfilCreate, db: Session = Depends(get_db)):
 def listar_perfis(db: Session = Depends(get_db)): 
     return db.query(models.Perfil).all()
 
-# Atualizar perfil
+# Atualizar perfil buscando pelo id_perfil
 @router.put("/{id_perfil}", response_model=schemas.Perfil)
 def atualizar_perfil(id_perfil: int, perfil_atualizado: schemas.PerfilCreate, db: Session = Depends(get_db)):
     db_perfil = db.query(models.Perfil).filter(models.Perfil.id_perfil == id_perfil).first()
-    if not db_perfil:
-        raise HTTPException(status_code=404, detail="Perfil não encontrado")
-
     db_perfil.nome_perfil = perfil_atualizado.nome_perfil
     db.commit()
     db.refresh(db_perfil)
